@@ -13,15 +13,32 @@ class AuthController extends Controller
      */
     public function showRegister()
     {
+        if (Admin::query()->exists()) {
+            return redirect()
+                ->route('login')
+                ->with(
+                    'error',
+                    'Registration is closed. Please login.'
+                );
+        }
+
         return view('auth.register');
     }
-
 
     /**
      * Process Registration
      */
     public function register(Request $request)
     {
+        if (Admin::query()->exists()) {
+            return redirect()
+                ->route('login')
+                ->with(
+                    'error',
+                    'Registration is closed. Please login.'
+                );
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
             'middle_name' => 'nullable|string|max:100',
@@ -29,7 +46,6 @@ class AuthController extends Controller
             'username' => 'required|string|max:100|unique:admins,username',
             'password' => 'required|string|min:6|confirmed',
         ]);
-
 
         Admin::create([
             'first_name' => $validated['first_name'],
@@ -40,7 +56,6 @@ class AuthController extends Controller
             'role' => 'admin',
         ]);
 
-
         return redirect()
             ->route('login')
             ->with(
@@ -49,7 +64,6 @@ class AuthController extends Controller
             );
     }
 
-
     /**
      * Show Login Page
      */
@@ -57,7 +71,6 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-
 
     /**
      * Process Login
@@ -70,18 +83,16 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-
         // Find admin by username
         $admin = Admin::where(
             'username',
             $credentials['username']
         )->first();
 
-
         // Check username and password
         if (
-            !$admin ||
-            !Hash::check(
+            ! $admin ||
+            ! Hash::check(
                 $credentials['password'],
                 $admin->password
             )
@@ -93,45 +104,33 @@ class AuthController extends Controller
                 ->onlyInput('username');
         }
 
-
         // Store admin information in session
         $request->session()->regenerate();
 
         session([
             'admin_id' => $admin->id,
             'admin_username' => $admin->username,
-            'admin_name' => $admin->first_name . ' ' . $admin->last_name,
+            'admin_name' => $admin->first_name.' '.$admin->last_name,
             'admin_role' => $admin->role,
         ]);
-
 
         // Redirect to dashboard
         return redirect()
             ->route('dashboard')
             ->with(
                 'success',
-                'Welcome back, ' . $admin->first_name . '!'
+                'Welcome back, '.$admin->first_name.'!'
             );
     }
-
 
     /**
      * Logout
      */
     public function logout(Request $request)
     {
-        // Remove login session
-        $request->session()->forget([
-            'admin_id',
-            'admin_username',
-            'admin_name',
-            'admin_role',
-        ]);
+        $request->session()->invalidate();
 
-
-        // Regenerate session
         $request->session()->regenerateToken();
-
 
         // Redirect to login
         return redirect()

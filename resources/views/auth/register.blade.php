@@ -70,7 +70,7 @@
 
             <!-- Register Form -->
 
-            <form action="{{ route('register') }}" method="POST">
+            <form action="{{ route('register.store') }}" method="POST">
 
                 @csrf
 

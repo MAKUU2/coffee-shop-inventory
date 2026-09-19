@@ -7,14 +7,11 @@ use App\Http\Controllers\LowStockController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
-
 use App\Models\Ingredient;
 use App\Models\Product;
 use App\Models\StockIn;
 use App\Models\StockOut;
-
 use Illuminate\Support\Facades\Route;
-
 
 // =============================
 // AUTH ROUTES
@@ -24,24 +21,24 @@ Route::get('/register', [AuthController::class, 'showRegister'])
     ->name('register');
 
 Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:5,1')
     ->name('register.store');
 
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login');
 
 Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1')
     ->name('login.process');
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
-
 
 // =============================
 // PROTECTED ADMIN ROUTES
 // =============================
 
 Route::middleware('admin.auth')->group(function () {
-
 
     // =============================
     // DASHBOARD ROUTE
@@ -59,7 +56,6 @@ Route::middleware('admin.auth')->group(function () {
 
         $totalStockOuts = StockOut::count();
 
-
         // Low stock
 
         $lowStockCount = Ingredient::whereColumn(
@@ -68,7 +64,6 @@ Route::middleware('admin.auth')->group(function () {
             'minimum_stock'
         )->count();
 
-
         $lowStockIngredients = Ingredient::whereColumn(
             'stock',
             '<=',
@@ -76,7 +71,6 @@ Route::middleware('admin.auth')->group(function () {
         )
             ->orderBy('stock', 'asc')
             ->get();
-
 
         // Send data to dashboard
 
@@ -89,7 +83,6 @@ Route::middleware('admin.auth')->group(function () {
             'lowStockIngredients'
         ));
     })->name('dashboard');
-
 
     // =============================
     // CATEGORY ROUTES
@@ -113,7 +106,6 @@ Route::middleware('admin.auth')->group(function () {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
         ->name('categories.destroy');
 
-
     // =============================
     // PRODUCT ROUTES
     // =============================
@@ -135,7 +127,6 @@ Route::middleware('admin.auth')->group(function () {
 
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])
         ->name('products.destroy');
-
 
     // =============================
     // INGREDIENT ROUTES
@@ -159,7 +150,6 @@ Route::middleware('admin.auth')->group(function () {
     Route::delete('/ingredients/{ingredient}', [IngredientController::class, 'destroy'])
         ->name('ingredients.destroy');
 
-
     // =============================
     // STOCK IN ROUTES
     // =============================
@@ -182,7 +172,6 @@ Route::middleware('admin.auth')->group(function () {
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])
         ->name('stock-ins.destroy');
 
-
     // =============================
     // STOCK OUT ROUTES
     // =============================
@@ -204,7 +193,6 @@ Route::middleware('admin.auth')->group(function () {
 
     Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])
         ->name('stock-outs.destroy');
-
 
     // =============================
     // LOW STOCK ROUTE
