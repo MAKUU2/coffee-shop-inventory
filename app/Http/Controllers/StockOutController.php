@@ -81,12 +81,17 @@ class StockOutController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $oldQuantity = (float) $stockOut->quantity;
-        $oldIngredientId = (int) $stockOut->ingredient_id;
         $newIngredientId = (int) $validated['ingredient_id'];
         $newQuantity = (float) $validated['quantity'];
 
-        DB::transaction(function () use ($stockOut, $validated, $oldQuantity, $oldIngredientId, $newIngredientId, $newQuantity) {
+        DB::transaction(function () use ($stockOut, $validated, $newIngredientId, $newQuantity) {
+            $freshStockOut = StockOut::whereKey($stockOut->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $oldQuantity = (float) $freshStockOut->quantity;
+            $oldIngredientId = (int) $freshStockOut->ingredient_id;
+
             // Same ingredient
             if ($oldIngredientId === $newIngredientId) {
                 $ingredient = Ingredient::whereKey($newIngredientId)
@@ -109,7 +114,7 @@ class StockOutController extends Controller
                     ]);
                 }
 
-                $stockOut->update($validated);
+                $freshStockOut->update($validated);
 
                 $ingredient->decrement(
                     'stock',
@@ -141,7 +146,7 @@ class StockOutController extends Controller
                     ]);
                 }
 
-                $stockOut->update($validated);
+                $freshStockOut->update($validated);
 
                 // Ibalik ang dating quantity sa old ingredient
                 $oldIngredient->increment(

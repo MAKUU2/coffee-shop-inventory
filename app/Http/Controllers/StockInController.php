@@ -70,12 +70,17 @@ class StockInController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $oldQuantity = (float) $stockIn->quantity;
-        $oldIngredientId = (int) $stockIn->ingredient_id;
         $newIngredientId = (int) $validated['ingredient_id'];
         $newQuantity = (float) $validated['quantity'];
 
-        DB::transaction(function () use ($stockIn, $validated, $oldQuantity, $oldIngredientId, $newIngredientId, $newQuantity) {
+        DB::transaction(function () use ($stockIn, $validated, $newIngredientId, $newQuantity) {
+            $freshStockIn = StockIn::whereKey($stockIn->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $oldQuantity = (float) $freshStockIn->quantity;
+            $oldIngredientId = (int) $freshStockIn->ingredient_id;
+
             if ($oldIngredientId === $newIngredientId) {
                 $ingredient = Ingredient::whereKey($newIngredientId)
                     ->lockForUpdate()
@@ -89,7 +94,7 @@ class StockInController extends Controller
                     ]);
                 }
 
-                $stockIn->update($validated);
+                $freshStockIn->update($validated);
 
                 $ingredient->increment('stock', $difference);
             } else {
@@ -114,7 +119,7 @@ class StockInController extends Controller
                     ]);
                 }
 
-                $stockIn->update($validated);
+                $freshStockIn->update($validated);
 
                 $oldIngredient->decrement('stock', $oldQuantity);
                 $newIngredient->increment('stock', $newQuantity);

@@ -385,4 +385,112 @@ class InventoryTest extends TestCase
 
         $response->assertRedirect(route('login'));
     }
+
+    public function test_stock_in_update_uses_fresh_ledger_value_same_ingredient(): void
+    {
+        // SQLite :memory: cannot prove true concurrent locking; this proves
+        // update() calculates from the current database ledger row.
+        $admin = $this->createAdmin();
+        $ingredient = $this->createIngredient(['stock' => 20.00]);
+        $stockIn = StockIn::create([
+            'ingredient_id' => $ingredient->id,
+            'quantity' => 10.00,
+            'cost_per_unit' => 12.00,
+            'stock_in_date' => now()->toDateString(),
+        ]);
+
+        // Simulate another committed change before the PUT request.
+        $stockIn->update(['quantity' => 6.00]);
+
+        $response = $this->withSession($this->adminSession($admin))->put(route('stock-ins.update', $stockIn), [
+            'ingredient_id' => $ingredient->id,
+            'quantity' => 15.50,
+            'cost_per_unit' => 12.00,
+            'stock_in_date' => now()->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('stock-ins.index'));
+        $this->assertEquals(15.50, (float) $stockIn->refresh()->quantity);
+        $this->assertEquals(29.50, (float) $ingredient->refresh()->stock);
+    }
+
+    public function test_stock_in_update_uses_fresh_ledger_value_when_switching_ingredient(): void
+    {
+        $admin = $this->createAdmin();
+        $oldIngredient = $this->createIngredient(['name' => 'Old Beans', 'stock' => 20.00]);
+        $newIngredient = $this->createIngredient(['name' => 'New Beans', 'stock' => 30.00]);
+        $stockIn = StockIn::create([
+            'ingredient_id' => $oldIngredient->id,
+            'quantity' => 10.00,
+            'cost_per_unit' => 12.00,
+            'stock_in_date' => now()->toDateString(),
+        ]);
+
+        // Simulate another committed change before the PUT request.
+        $stockIn->update(['quantity' => 4.00]);
+
+        $response = $this->withSession($this->adminSession($admin))->put(route('stock-ins.update', $stockIn), [
+            'ingredient_id' => $newIngredient->id,
+            'quantity' => 7.00,
+            'cost_per_unit' => 12.00,
+            'stock_in_date' => now()->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('stock-ins.index'));
+        $this->assertEquals($newIngredient->id, $stockIn->refresh()->ingredient_id);
+        $this->assertEquals(7.00, (float) $stockIn->refresh()->quantity);
+        $this->assertEquals(16.00, (float) $oldIngredient->refresh()->stock);
+        $this->assertEquals(37.00, (float) $newIngredient->refresh()->stock);
+    }
+
+    public function test_stock_out_update_uses_fresh_ledger_value_same_ingredient(): void
+    {
+        $admin = $this->createAdmin();
+        $ingredient = $this->createIngredient(['stock' => 12.00]);
+        $stockOut = StockOut::create([
+            'ingredient_id' => $ingredient->id,
+            'quantity' => 5.00,
+            'stock_out_date' => now()->toDateString(),
+        ]);
+
+        // Simulate another committed change before the PUT request.
+        $stockOut->update(['quantity' => 8.00]);
+
+        $response = $this->withSession($this->adminSession($admin))->put(route('stock-outs.update', $stockOut), [
+            'ingredient_id' => $ingredient->id,
+            'quantity' => 10.00,
+            'stock_out_date' => now()->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('stock-outs.index'));
+        $this->assertEquals(10.00, (float) $stockOut->refresh()->quantity);
+        $this->assertEquals(10.00, (float) $ingredient->refresh()->stock);
+    }
+
+    public function test_stock_out_update_uses_fresh_ledger_value_when_switching_ingredient(): void
+    {
+        $admin = $this->createAdmin();
+        $oldIngredient = $this->createIngredient(['name' => 'Old Beans', 'stock' => 15.00]);
+        $newIngredient = $this->createIngredient(['name' => 'New Beans', 'stock' => 20.00]);
+        $stockOut = StockOut::create([
+            'ingredient_id' => $oldIngredient->id,
+            'quantity' => 5.00,
+            'stock_out_date' => now()->toDateString(),
+        ]);
+
+        // Simulate another committed change before the PUT request.
+        $stockOut->update(['quantity' => 9.00]);
+
+        $response = $this->withSession($this->adminSession($admin))->put(route('stock-outs.update', $stockOut), [
+            'ingredient_id' => $newIngredient->id,
+            'quantity' => 6.00,
+            'stock_out_date' => now()->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('stock-outs.index'));
+        $this->assertEquals($newIngredient->id, $stockOut->refresh()->ingredient_id);
+        $this->assertEquals(6.00, (float) $stockOut->refresh()->quantity);
+        $this->assertEquals(24.00, (float) $oldIngredient->refresh()->stock);
+        $this->assertEquals(14.00, (float) $newIngredient->refresh()->stock);
+    }
 }
