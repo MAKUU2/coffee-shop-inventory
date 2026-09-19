@@ -1,59 +1,282 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ☕ Coffee Shop Inventory Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A web-based inventory management system designed to help coffee shops manage their products, ingredients, stock movements, and low-stock items efficiently.
 
-## About Laravel
+## 📌 Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The **Coffee Shop Inventory Management System** is a Laravel-based web application that provides an organized way to manage coffee shop inventory.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The system allows administrators to manage products and ingredients, record stock-in and stock-out transactions, monitor inventory levels, and identify ingredients that have reached their minimum stock level.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Features
 
-## Learning Laravel
+- 🔐 Admin Login and Registration
+- 📊 Dashboard with Inventory Statistics
+- 📦 Product Management
+- 🏷️ Category Management
+- 🧂 Ingredient Management
+- 📥 Stock In Management
+- 📤 Stock Out Management
+- ⚠️ Low Stock Monitoring
+- 🔄 Automatic Stock Updates
+- 🗑️ Add, Edit, and Delete Records
+- 🔒 Protected Admin Routes
+- 🗄️ MySQL Database Integration
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🛠️ Technologies Used
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Technology   | Purpose                       |
+| ------------ | ----------------------------- |
+| PHP          | Backend Programming           |
+| Laravel 12   | Web Application Framework     |
+| MySQL        | Database Management           |
+| Blade        | Laravel Template Engine       |
+| HTML5        | Page Structure                |
+| CSS          | Styling                       |
+| Tailwind CSS | User Interface                |
+| JavaScript   | Client-side Interaction       |
+| Git          | Version Control               |
+| GitHub       | Source Code Repository        |
+| XAMPP        | Local Development Environment |
 
-## Laravel Sponsors
+## 📂 Main Modules
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Dashboard
 
-### Premium Partners
+Provides an overview of the inventory system, including:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- Total Products
+- Total Ingredients
+- Stock In Records
+- Stock Out Records
+- Low Stock Items
 
-## Contributing
+### Product Management
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Administrators can:
 
-## Code of Conduct
+- Add products
+- Edit products
+- Delete products
+- Assign products to categories
+- Manage product prices and stock
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Category Management
 
-## Security Vulnerabilities
+Administrators can organize products using categories.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Ingredient Management
 
-## License
+Administrators can manage:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Ingredient name
+- Description
+- Unit
+- Current stock
+- Minimum stock
+- Cost per unit
+
+### Stock In
+
+Records incoming ingredients and automatically increases the current ingredient stock.
+
+### Stock Out
+
+Records outgoing ingredients and automatically decreases the current ingredient stock.
+
+The system also checks whether sufficient stock is available before recording a stock-out transaction.
+
+### Low Stock Monitoring
+
+The system identifies ingredients where:
+
+```text
+Current Stock <= Minimum Stock
+```
+
+These ingredients are displayed on the Low Stock page and dashboard.
+
+## 🔐 Authentication
+
+The system includes a simple administrator authentication system.
+
+Administrators can:
+
+- Register an account
+- Login
+- Logout
+- Access protected inventory pages
+
+Protected routes use Laravel middleware to prevent unauthorized access.
+
+## 🗄️ Database
+
+The system uses **MySQL** as its database.
+
+Main tables include:
+
+- `admins`
+- `categories`
+- `products`
+- `ingredients`
+- `stock_ins`
+- `stock_outs`
+
+## 💻 Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/MAKUU2/coffee-shop-inventory.git
+```
+
+### 2. Open the project
+
+```bash
+cd coffee-shop-inventory
+```
+
+### 3. Install PHP dependencies
+
+```bash
+composer install
+```
+
+### 4. Create the environment file
+
+```bash
+copy .env.example .env
+```
+
+For macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+### 5. Generate the application key
+
+```bash
+php artisan key:generate
+```
+
+### 6. Create the database
+
+Create a MySQL database named:
+
+```text
+coffee_shop
+```
+
+### 7. Configure `.env`
+
+Update the database settings:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=coffee_shop
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Adjust the username and password according to your local MySQL configuration.
+
+### 8. Run migrations
+
+```bash
+php artisan migrate
+```
+
+### 9. Start the Laravel development server
+
+```bash
+php artisan serve
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+## 📁 Project Structure
+
+```text
+coffee-shop-inventory/
+│
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   └── Middleware/
+│   │
+│   └── Models/
+│
+├── database/
+│   └── migrations/
+│
+├── resources/
+│   └── views/
+│       ├── auth/
+│       ├── categories/
+│       ├── ingredients/
+│       ├── products/
+│       ├── stock_ins/
+│       ├── stock_outs/
+│       ├── low_stock/
+│       └── dashboard.blade.php
+│
+├── routes/
+│   └── web.php
+│
+├── public/
+├── config/
+├── bootstrap/
+├── tests/
+│
+├── composer.json
+└── README.md
+```
+
+## 🎯 Learning Objectives
+
+This project was developed to practice and demonstrate the following:
+
+- Laravel fundamentals
+- MVC architecture
+- CRUD operations
+- Database relationships
+- MySQL database management
+- Form validation
+- Laravel routing
+- Middleware
+- Authentication
+- Inventory management logic
+- Git and GitHub workflow
+
+## 🚀 Future Improvements
+
+Possible future improvements include:
+
+- Inventory reports
+- Sales management
+- User roles and permissions
+- Search and filtering
+- Export reports to PDF or Excel
+- Product sales tracking
+- Inventory history
+- Improved dashboard charts
+- Email notifications for low stock
+
+## 👨‍💻 Developer
+
+**Mark Joseph Ladot**
+
+GitHub:
+
+https://github.com/MAKUU2
+
+## 📄 License
+
+This project is created for educational and portfolio purposes.
