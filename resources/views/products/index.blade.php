@@ -140,7 +140,7 @@
 
                                 <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
 
-                                    {{ $product->category->name }}
+                                    {{ $product->category->name ?? 'No Category' }}
 
                                 </span>
 
