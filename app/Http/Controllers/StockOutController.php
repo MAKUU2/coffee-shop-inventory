@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Ingredient;
 use App\Models\StockOut;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class StockOutController extends Controller
 {
@@ -33,27 +35,27 @@ class StockOutController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $ingredient = Ingredient::findOrFail(
-            $validated['ingredient_id']
-        );
+        DB::transaction(function () use ($validated) {
+            $ingredient = Ingredient::whereKey($validated['ingredient_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        // Check kung sapat ang stock
-        if ($ingredient->stock < $validated['quantity']) {
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'quantity' => 'Not enough stock available.'
+            // Check kung sapat ang stock
+            if ((float) $ingredient->stock < (float) $validated['quantity']) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Not enough stock available.',
                 ]);
-        }
+            }
 
-        // Gumawa ng Stock Out record
-        StockOut::create($validated);
+            // Gumawa ng Stock Out record
+            StockOut::create($validated);
 
-        // Bawasan ang ingredient stock
-        $ingredient->decrement(
-            'stock',
-            $validated['quantity']
-        );
+            // Bawasan ang ingredient stock
+            $ingredient->decrement(
+                'stock',
+                $validated['quantity']
+            );
+        });
 
         return redirect()
             ->route('stock-outs.index')
@@ -79,66 +81,81 @@ class StockOutController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $oldQuantity = $stockOut->quantity;
-        $oldIngredientId = $stockOut->ingredient_id;
+        $oldQuantity = (float) $stockOut->quantity;
+        $oldIngredientId = (int) $stockOut->ingredient_id;
+        $newIngredientId = (int) $validated['ingredient_id'];
+        $newQuantity = (float) $validated['quantity'];
 
-        // Same ingredient
-        if ($oldIngredientId == $validated['ingredient_id']) {
+        DB::transaction(function () use ($stockOut, $validated, $oldQuantity, $oldIngredientId, $newIngredientId, $newQuantity) {
+            // Same ingredient
+            if ($oldIngredientId === $newIngredientId) {
+                $ingredient = Ingredient::whereKey($newIngredientId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            $ingredient = Ingredient::findOrFail(
-                $validated['ingredient_id']
-            );
+                $difference = $newQuantity - $oldQuantity;
 
-            $difference = $validated['quantity'] - $oldQuantity;
-
-            // Kung dinagdagan ang Stock Out quantity,
-            // siguraduhin na sapat ang remaining stock.
-            if ($difference > 0 && $ingredient->stock < $difference) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'quantity' => 'Not enough stock available.'
+                // Kung dinagdagan ang Stock Out quantity,
+                // siguraduhin na sapat ang remaining stock.
+                if ($difference > 0 && (float) $ingredient->stock < $difference) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Not enough stock available.',
                     ]);
-            }
+                }
 
-            $ingredient->decrement(
-                'stock',
-                $difference
-            );
-        } else {
-
-            // Magkaibang ingredient
-            $oldIngredient = Ingredient::findOrFail(
-                $oldIngredientId
-            );
-
-            $newIngredient = Ingredient::findOrFail(
-                $validated['ingredient_id']
-            );
-
-            // Check kung sapat ang bagong ingredient
-            if ($newIngredient->stock < $validated['quantity']) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'quantity' => 'Not enough stock available.'
+                if ((float) $ingredient->stock - $difference < 0) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Not enough stock available.',
                     ]);
+                }
+
+                $stockOut->update($validated);
+
+                $ingredient->decrement(
+                    'stock',
+                    $difference
+                );
+            } else {
+                // Magkaibang ingredient: lock in id order to avoid deadlocks
+                $ids = collect([$oldIngredientId, $newIngredientId])->sort()->values();
+
+                $locked = Ingredient::whereIn('id', $ids)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                // Magkaibang ingredient
+                $oldIngredient = $locked->get($oldIngredientId) ?? throw ValidationException::withMessages([
+                    'ingredient_id' => 'Original ingredient not found.',
+                ]);
+
+                $newIngredient = $locked->get($newIngredientId) ?? throw ValidationException::withMessages([
+                    'ingredient_id' => 'Selected ingredient not found.',
+                ]);
+
+                // Check kung sapat ang bagong ingredient
+                if ((float) $newIngredient->stock < $newQuantity) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Not enough stock available.',
+                    ]);
+                }
+
+                $stockOut->update($validated);
+
+                // Ibalik ang dating quantity sa old ingredient
+                $oldIngredient->increment(
+                    'stock',
+                    $oldQuantity
+                );
+
+                // Bawasan ang bagong ingredient
+                $newIngredient->decrement(
+                    'stock',
+                    $newQuantity
+                );
             }
-
-            // Ibalik ang dating quantity sa old ingredient
-            $oldIngredient->increment(
-                'stock',
-                $oldQuantity
-            );
-
-            // Bawasan ang bagong ingredient
-            $newIngredient->decrement(
-                'stock',
-                $validated['quantity']
-            );
-        }
-
-        $stockOut->update($validated);
+        });
 
         return redirect()
             ->route('stock-outs.index')
@@ -147,17 +164,19 @@ class StockOutController extends Controller
 
     public function destroy(StockOut $stockOut)
     {
-        $ingredient = Ingredient::findOrFail(
-            $stockOut->ingredient_id
-        );
+        DB::transaction(function () use ($stockOut) {
+            $ingredient = Ingredient::whereKey($stockOut->ingredient_id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        // Ibalik ang stock kapag dinelete ang Stock Out
-        $ingredient->increment(
-            'stock',
-            $stockOut->quantity
-        );
+            // Ibalik ang stock kapag dinelete ang Stock Out
+            $ingredient->increment(
+                'stock',
+                $stockOut->quantity
+            );
 
-        $stockOut->delete();
+            $stockOut->delete();
+        });
 
         return redirect()
             ->route('stock-outs.index')

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Ingredient;
 use App\Models\StockIn;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class StockInController extends Controller
 {
@@ -34,11 +36,17 @@ class StockInController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $stockIn = StockIn::create($validated);
+        $stockIn = DB::transaction(function () use ($validated) {
+            $ingredient = Ingredient::whereKey($validated['ingredient_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $ingredient = Ingredient::findOrFail($validated['ingredient_id']);
+            $stockIn = StockIn::create($validated);
 
-        $ingredient->increment('stock', $validated['quantity']);
+            $ingredient->increment('stock', $validated['quantity']);
+
+            return $stockIn;
+        });
 
         return redirect()
             ->route('stock-ins.index')
@@ -62,26 +70,56 @@ class StockInController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $oldQuantity = $stockIn->quantity;
-        $oldIngredientId = $stockIn->ingredient_id;
+        $oldQuantity = (float) $stockIn->quantity;
+        $oldIngredientId = (int) $stockIn->ingredient_id;
+        $newIngredientId = (int) $validated['ingredient_id'];
+        $newQuantity = (float) $validated['quantity'];
 
-        $stockIn->update($validated);
+        DB::transaction(function () use ($stockIn, $validated, $oldQuantity, $oldIngredientId, $newIngredientId, $newQuantity) {
+            if ($oldIngredientId === $newIngredientId) {
+                $ingredient = Ingredient::whereKey($newIngredientId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        if ($oldIngredientId == $validated['ingredient_id']) {
+                $difference = $newQuantity - $oldQuantity;
 
-            $ingredient = Ingredient::findOrFail($validated['ingredient_id']);
+                if ((float) $ingredient->stock + $difference < 0) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Not enough stock available to adjust this record.',
+                    ]);
+                }
 
-            $difference = $validated['quantity'] - $oldQuantity;
+                $stockIn->update($validated);
 
-            $ingredient->increment('stock', $difference);
-        } else {
+                $ingredient->increment('stock', $difference);
+            } else {
+                $ids = collect([$oldIngredientId, $newIngredientId])->sort()->values();
 
-            $oldIngredient = Ingredient::findOrFail($oldIngredientId);
-            $newIngredient = Ingredient::findOrFail($validated['ingredient_id']);
+                $locked = Ingredient::whereIn('id', $ids)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
 
-            $oldIngredient->decrement('stock', $oldQuantity);
-            $newIngredient->increment('stock', $validated['quantity']);
-        }
+                $oldIngredient = $locked->get($oldIngredientId) ?? throw ValidationException::withMessages([
+                    'ingredient_id' => 'Original ingredient not found.',
+                ]);
+                $newIngredient = $locked->get($newIngredientId) ?? throw ValidationException::withMessages([
+                    'ingredient_id' => 'Selected ingredient not found.',
+                ]);
+
+                if ((float) $oldIngredient->stock - $oldQuantity < 0) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'Not enough stock available to adjust this record.',
+                    ]);
+                }
+
+                $stockIn->update($validated);
+
+                $oldIngredient->decrement('stock', $oldQuantity);
+                $newIngredient->increment('stock', $newQuantity);
+            }
+        });
 
         return redirect()
             ->route('stock-ins.index')
@@ -90,11 +128,21 @@ class StockInController extends Controller
 
     public function destroy(StockIn $stockIn)
     {
-        $ingredient = Ingredient::findOrFail($stockIn->ingredient_id);
+        DB::transaction(function () use ($stockIn) {
+            $ingredient = Ingredient::whereKey($stockIn->ingredient_id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $ingredient->decrement('stock', $stockIn->quantity);
+            if ((float) $ingredient->stock - (float) $stockIn->quantity < 0) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Cannot delete this record: ingredient stock would become negative.',
+                ]);
+            }
 
-        $stockIn->delete();
+            $ingredient->decrement('stock', $stockIn->quantity);
+
+            $stockIn->delete();
+        });
 
         return redirect()
             ->route('stock-ins.index')
