@@ -1,119 +1,45 @@
-# ☕ Coffee Shop Inventory Management System
+# Coffee Shop Inventory Management System
 
-A web-based inventory management system designed to help coffee shops manage their products, ingredients, stock movements, and low-stock items efficiently.
+A Laravel-based inventory management system for a coffee shop: products, ingredients, stock-in/stock-out transactions, low-stock alerts, and a dashboard with inventory statistics.
 
-## 📌 Project Overview
+## Features
 
-The **Coffee Shop Inventory Management System** is a Laravel-based web application that provides an organized way to manage coffee shop inventory.
+- Admin authentication (single-admin design)
+- Dashboard with inventory statistics
+- Category management (CRUD)
+- Product management (CRUD)
+- Ingredient management (CRUD)
+- Stock In management (CRUD + automatic stock increase)
+- Stock Out management (CRUD + automatic stock decrease with availability check)
+- Low Stock monitoring (`stock <= minimum_stock`)
+- Inventory transaction protection (database transactions + row locking)
+- Database foreign-key protection (RESTRICT + application-level delete guards)
+- Automated feature tests (39 tests / 140 assertions)
 
-The system allows administrators to manage products and ingredients, record stock-in and stock-out transactions, monitor inventory levels, and identify ingredients that have reached their minimum stock level.
+## Technology Stack
 
-## ✨ Features
+| Technology | Version / Notes |
+| ---------- | --------------- |
+| PHP | 8.2+ |
+| Laravel | 12 |
+| MySQL | Local development database |
+| Blade | Server-rendered templates |
+| Tailwind CSS | Loaded through CDN in Blade views |
+| Vite | Files exist in the default Laravel scaffold, but the current Blade views use Tailwind CDN, so a Vite production build is not required to run the app |
+| PHPUnit | Feature/unit testing as configured in `phpunit.xml` |
+| Laravel Pint | PHP code style |
 
-- 🔐 Admin Login and Registration
-- 📊 Dashboard with Inventory Statistics
-- 📦 Product Management
-- 🏷️ Category Management
-- 🧂 Ingredient Management
-- 📥 Stock In Management
-- 📤 Stock Out Management
-- ⚠️ Low Stock Monitoring
-- 🔄 Automatic Stock Updates
-- 🗑️ Add, Edit, and Delete Records
-- 🔒 Protected Admin Routes
-- 🗄️ MySQL Database Integration
+## System Highlights
 
-## 🛠️ Technologies Used
+- Stock changes happen only through Stock In and Stock Out transactions; the ingredient form does not accept direct stock edits.
+- Stock operations run inside database transactions and lock inventory rows with `lockForUpdate()` where needed.
+- Stock Out rejects quantities that exceed available stock, including exact-boundary handling (`stock == quantity` succeeds).
+- Updates account for current ledger values before recalculating stock.
+- Categories with products cannot be deleted; ingredients with stock history cannot be deleted.
 
-| Technology   | Purpose                       |
-| ------------ | ----------------------------- |
-| PHP          | Backend Programming           |
-| Laravel 12   | Web Application Framework     |
-| MySQL        | Database Management           |
-| Blade        | Laravel Template Engine       |
-| HTML5        | Page Structure                |
-| CSS          | Styling                       |
-| Tailwind CSS | User Interface                |
-| JavaScript   | Client-side Interaction       |
-| Git          | Version Control               |
-| GitHub       | Source Code Repository        |
-| XAMPP        | Local Development Environment |
+## Database Overview
 
-## 📂 Main Modules
-
-### Dashboard
-
-Provides an overview of the inventory system, including:
-
-- Total Products
-- Total Ingredients
-- Stock In Records
-- Stock Out Records
-- Low Stock Items
-
-### Product Management
-
-Administrators can:
-
-- Add products
-- Edit products
-- Delete products
-- Assign products to categories
-- Manage product prices and stock
-
-### Category Management
-
-Administrators can organize products using categories.
-
-### Ingredient Management
-
-Administrators can manage:
-
-- Ingredient name
-- Description
-- Unit
-- Current stock
-- Minimum stock
-- Cost per unit
-
-### Stock In
-
-Records incoming ingredients and automatically increases the current ingredient stock.
-
-### Stock Out
-
-Records outgoing ingredients and automatically decreases the current ingredient stock.
-
-The system also checks whether sufficient stock is available before recording a stock-out transaction.
-
-### Low Stock Monitoring
-
-The system identifies ingredients where:
-
-```text
-Current Stock <= Minimum Stock
-```
-
-These ingredients are displayed on the Low Stock page and dashboard.
-
-## 🔐 Authentication
-
-The system includes a simple administrator authentication system.
-
-Administrators can:
-
-- Register an account
-- Login
-- Logout
-- Access protected inventory pages
-
-Protected routes use Laravel middleware to prevent unauthorized access.
-
-## 🗄️ Database
-
-The system uses **MySQL** as its database.
-
-Main tables include:
+Main application tables:
 
 - `admins`
 - `categories`
@@ -122,161 +48,133 @@ Main tables include:
 - `stock_ins`
 - `stock_outs`
 
-## 💻 Installation
+Foreign keys use `RESTRICT` behavior so history cannot be silently cascade-deleted. Controllers additionally block deletes that would orphan products or erase stock history.
 
-### 1. Clone the repository
+## Authentication
 
+- Single-admin design: registration is available only while no admin account exists.
+- Once the first admin exists, registration is closed by the application (requests redirect to login).
+- Login uses username and password; passwords are hashed before storage.
+- `POST /login` and `POST /register` are throttled (`throttle:5,1`).
+- Protected routes use the `admin.auth` middleware.
+- Logout uses `POST /logout` with session invalidation.
+
+## Inventory Safety
+
+- New ingredients always start with `stock = 0`; initial quantity is added through Stock In.
+- Editing an ingredient never changes its stock; metadata (name, unit, minimum stock, cost) remains editable.
+- Every stock change is a ledger record (`stock_ins` / `stock_outs`) plus an atomic stock adjustment.
+- Negative inventory is rejected on create, update, and delete paths.
+- Deleting a Stock In that would drive stock negative is rejected; deleting a Stock Out restores stock.
+
+## Installation
+
+1. Clone/download the project:
+   ```bash
+   git clone https://github.com/MAKUU2/coffee-shop-inventory.git
+   ```
+2. Enter the project directory:
+   ```bash
+   cd coffee-shop-inventory
+   ```
+3. Install PHP dependencies:
+   ```bash
+   composer install
+   ```
+4. Create `.env` from `.env.example`:
+   ```bash
+   copy .env.example .env
+   ```
+   macOS/Linux:
+   ```bash
+   cp .env.example .env
+   ```
+5. Configure the MySQL database in `.env`:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=coffee_shop
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+   Adjust `DB_USERNAME` and `DB_PASSWORD` to match the local MySQL setup.
+6. Generate the application key:
+   ```bash
+   php artisan key:generate
+   ```
+7. Run migrations:
+   ```bash
+   php artisan migrate
+   ```
+8. Start Laravel:
+   ```bash
+   php artisan serve
+   ```
+9. Open the application at `http://127.0.0.1:8000` and register the first (and only) admin account.
+
+No frontend build step is required: Blade views load Tailwind through the CDN.
+
+## Testing
+
+Run the test suite:
 ```bash
-git clone https://github.com/MAKUU2/coffee-shop-inventory.git
+php artisan test
 ```
 
-### 2. Open the project
-
+Check code style without changing files:
 ```bash
-cd coffee-shop-inventory
+vendor/bin/pint --test
 ```
 
-### 3. Install PHP dependencies
+Current state: 39 passing tests / 140 assertions, covering business rules such as inventory calculations, stock guards, boundary cases, fresh ledger values on update, delete protection, foreign-key restrictions, blocked direct stock manipulation, and missing-category display handling.
 
-```bash
-composer install
-```
+Most feature tests run against an isolated SQLite test database. MySQL-specific concurrency behavior (real `lockForUpdate()` contention) is therefore not fully proven by the SQLite suite; the tests verify calculation-from-fresh-row logic and rollback behavior.
 
-### 4. Create the environment file
-
-```bash
-copy .env.example .env
-```
-
-For macOS/Linux:
-
-```bash
-cp .env.example .env
-```
-
-### 5. Generate the application key
-
-```bash
-php artisan key:generate
-```
-
-### 6. Create the database
-
-Create a MySQL database named:
+## Project Structure
 
 ```text
-coffee_shop
+app/
+  Http/
+  Models/
+
+database/
+  migrations/
+
+resources/
+  views/
+
+routes/
+  web.php
+
+tests/
+  Feature/
 ```
 
-### 7. Configure `.env`
+## Current Scope / Limitations
 
-Update the database settings:
+- Portfolio-scale Laravel inventory system following a single-admin model.
+- Blade views currently use Tailwind CSS through the CDN; the Vite scaffold is present but unused.
+- Dashboard logic lives in a route closure with an additional query in the dashboard view; extracting a `DashboardController` is a possible later cleanup.
+- Additional authentication and dashboard-assertion tests can be added as the project grows.
 
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=coffee_shop
-DB_USERNAME=root
-DB_PASSWORD=
-```
+These are scope notes, not defects.
 
-Adjust the username and password according to your local MySQL configuration.
+## Future Improvements
 
-### 8. Run migrations
+- Shared Blade layout/components to remove duplicated page markup
+- `FormRequest` classes if validation grows
+- `DashboardController` extraction
+- Compiled frontend assets with Vite
+- Additional authentication/dashboard tests
+- Documentation expansion (screenshots, demo credentials for reviewers)
 
-```bash
-php artisan migrate
-```
-
-### 9. Start the Laravel development server
-
-```bash
-php artisan serve
-```
-
-Open:
-
-```text
-http://127.0.0.1:8000
-```
-
-## 📁 Project Structure
-
-```text
-coffee-shop-inventory/
-│
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   └── Middleware/
-│   │
-│   └── Models/
-│
-├── database/
-│   └── migrations/
-│
-├── resources/
-│   └── views/
-│       ├── auth/
-│       ├── categories/
-│       ├── ingredients/
-│       ├── products/
-│       ├── stock_ins/
-│       ├── stock_outs/
-│       ├── low_stock/
-│       └── dashboard.blade.php
-│
-├── routes/
-│   └── web.php
-│
-├── public/
-├── config/
-├── bootstrap/
-├── tests/
-│
-├── composer.json
-└── README.md
-```
-
-## 🎯 Learning Objectives
-
-This project was developed to practice and demonstrate the following:
-
-- Laravel fundamentals
-- MVC architecture
-- CRUD operations
-- Database relationships
-- MySQL database management
-- Form validation
-- Laravel routing
-- Middleware
-- Authentication
-- Inventory management logic
-- Git and GitHub workflow
-
-## 🚀 Future Improvements
-
-Possible future improvements include:
-
-- Inventory reports
-- Sales management
-- User roles and permissions
-- Search and filtering
-- Export reports to PDF or Excel
-- Product sales tracking
-- Inventory history
-- Improved dashboard charts
-- Email notifications for low stock
-
-## 👨‍💻 Developer
+## Developer
 
 **Mark Joseph Ladot**
 
-GitHub:
+GitHub: https://github.com/MAKUU2
 
-https://github.com/MAKUU2
+## License
 
-## 📄 License
-
-This project is created for educational and portfolio purposes.
+Created for educational and portfolio purposes.
