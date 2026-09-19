@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -61,7 +62,18 @@ class CategoryController extends Controller
             ]);
         }
 
-        $category->delete();
+        try {
+            $category->delete();
+        } catch (QueryException $exception) {
+            if ($exception->getCode() === '23000'
+                || (isset($exception->errorInfo[1]) && $exception->errorInfo[1] === 1451)) {
+                return back()->withErrors([
+                    'category' => 'Cannot delete this category because it has products assigned to it.',
+                ]);
+            }
+
+            throw $exception;
+        }
 
         return redirect()
             ->route('categories.index')

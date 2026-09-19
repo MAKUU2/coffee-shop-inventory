@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ingredient;
 use App\Models\StockIn;
 use App\Models\StockOut;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class IngredientController extends Controller
@@ -69,7 +70,18 @@ class IngredientController extends Controller
             ]);
         }
 
-        $ingredient->delete();
+        try {
+            $ingredient->delete();
+        } catch (QueryException $exception) {
+            if ($exception->getCode() === '23000'
+                || (isset($exception->errorInfo[1]) && $exception->errorInfo[1] === 1451)) {
+                return back()->withErrors([
+                    'ingredient' => 'Cannot delete this ingredient because it has stock transaction history.',
+                ]);
+            }
+
+            throw $exception;
+        }
 
         return redirect()
             ->route('ingredients.index')
