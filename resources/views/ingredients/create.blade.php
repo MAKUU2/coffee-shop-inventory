@@ -145,24 +145,16 @@
                 </div>
 
 
-                <!-- Stock -->
+                <!-- Stock Info -->
                 <div class="mb-5">
 
-                    <label for="stock"
-                        class="block text-sm font-semibold text-gray-700 mb-2">
-                        Current Stock
-                    </label>
+                    <p class="block text-sm font-semibold text-gray-700 mb-2">
+                        Initial Stock
+                    </p>
 
-                    <input
-                        type="number"
-                        id="stock"
-                        name="stock"
-                        value="{{ old('stock', 0) }}"
-                        min="0"
-                        step="0.01"
-                        placeholder="Example: 5"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required>
+                    <p class="text-sm text-gray-500">
+                        New ingredients start with 0 stock. Add initial stock through Stock In.
+                    </p>
 
                 </div>
 

@@ -27,12 +27,11 @@ class IngredientController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'unit' => 'required|string|max:50',
-            'stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
             'cost_per_unit' => 'required|numeric|min:0',
         ]);
 
-        Ingredient::create($validated);
+        Ingredient::create(array_merge($validated, ['stock' => 0]));
 
         return redirect()
             ->route('ingredients.index')
@@ -50,7 +49,6 @@ class IngredientController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'unit' => 'required|string|max:50',
-            'stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
             'cost_per_unit' => 'required|numeric|min:0',
         ]);
