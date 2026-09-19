@@ -56,6 +56,20 @@
         @endif
 
 
+        <!-- Validation Errors -->
+        @if ($errors->any())
+
+        <div class="bg-red-100 border border-red-300 text-red-700 px-5 py-4 rounded-lg mb-6">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+
+        @endif
+
+
         <!-- Category Table -->
         <div class="bg-white rounded-xl shadow overflow-hidden">
 

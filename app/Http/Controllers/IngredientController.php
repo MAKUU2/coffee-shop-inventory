@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
+use App\Models\StockIn;
+use App\Models\StockOut;
 use Illuminate\Http\Request;
 
 class IngredientController extends Controller
@@ -62,6 +64,13 @@ class IngredientController extends Controller
 
     public function destroy(Ingredient $ingredient)
     {
+        if (StockIn::where('ingredient_id', $ingredient->id)->exists()
+            || StockOut::where('ingredient_id', $ingredient->id)->exists()) {
+            return back()->withErrors([
+                'ingredient' => 'Cannot delete this ingredient because it has stock transaction history.',
+            ]);
+        }
+
         $ingredient->delete();
 
         return redirect()

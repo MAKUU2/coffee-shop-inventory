@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -54,6 +55,12 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        if (Product::where('category_id', $category->id)->exists()) {
+            return back()->withErrors([
+                'category' => 'Cannot delete this category because it has products assigned to it.',
+            ]);
+        }
+
         $category->delete();
 
         return redirect()
