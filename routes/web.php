@@ -2,15 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\LowStockController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
-use App\Models\Ingredient;
-use App\Models\Product;
-use App\Models\StockIn;
-use App\Models\StockOut;
 use Illuminate\Support\Facades\Route;
 
 // =============================
@@ -44,45 +41,7 @@ Route::middleware('admin.auth')->group(function () {
     // DASHBOARD ROUTE
     // =============================
 
-    Route::get('/', function () {
-
-        // Dashboard statistics
-
-        $totalProducts = Product::count();
-
-        $totalIngredients = Ingredient::count();
-
-        $totalStockIns = StockIn::count();
-
-        $totalStockOuts = StockOut::count();
-
-        // Low stock
-
-        $lowStockCount = Ingredient::whereColumn(
-            'stock',
-            '<=',
-            'minimum_stock'
-        )->count();
-
-        $lowStockIngredients = Ingredient::whereColumn(
-            'stock',
-            '<=',
-            'minimum_stock'
-        )
-            ->orderBy('stock', 'asc')
-            ->get();
-
-        // Send data to dashboard
-
-        return view('dashboard', compact(
-            'totalProducts',
-            'totalIngredients',
-            'totalStockIns',
-            'totalStockOuts',
-            'lowStockCount',
-            'lowStockIngredients'
-        ));
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // =============================
     // CATEGORY ROUTES

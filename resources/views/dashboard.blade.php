@@ -441,7 +441,158 @@
             </div>
 
 
+            <!-- TOTAL CATEGORIES -->
+
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200/70 p-5 lg:p-6">
+
+                <div class="flex items-start justify-between gap-3">
+
+                    <div class="min-w-0">
+
+                        <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                            Total Categories
+                        </p>
+
+                        <p class="text-3xl font-bold text-stone-900 tabular-nums mt-2">
+                            {{ $totalCategories }}
+                        </p>
+
+                    </div>
+
+                    <span class="flex items-center justify-center w-11 h-11 rounded-xl bg-sky-500/10 text-sky-700 shrink-0" aria-hidden="true">
+
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                        </svg>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- OUT OF STOCK -->
+
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200/70 p-5 lg:p-6">
+
+                <div class="flex items-start justify-between gap-3">
+
+                    <div class="min-w-0">
+
+                        <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                            Out of Stock
+                        </p>
+
+                        <p class="text-3xl font-bold text-red-700 tabular-nums mt-2">
+                            {{ $outOfStockCount }}
+                        </p>
+
+                    </div>
+
+                    <span class="flex items-center justify-center w-11 h-11 rounded-xl bg-red-500/10 text-red-700 shrink-0" aria-hidden="true">
+
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ESTIMATED INVENTORY VALUE -->
+
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200/70 p-5 lg:p-6 sm:col-span-2 xl:col-span-1">
+
+                <div class="flex items-start justify-between gap-3">
+
+                    <div class="min-w-0">
+
+                        <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                            Estimated Inventory Value
+                        </p>
+
+                        <p class="text-3xl font-bold text-amber-700 tabular-nums mt-2">
+                            &#8369;{{ number_format($inventoryValue, 2) }}
+                        </p>
+
+                    </div>
+
+                    <span class="flex items-center justify-center w-11 h-11 rounded-xl bg-amber-500/10 text-amber-700 shrink-0" aria-hidden="true">
+
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                        </svg>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
         </div>
+
+
+        <!-- ============================= -->
+        <!-- INVENTORY SUMMARY -->
+        <!-- ============================= -->
+
+        <section class="mt-6 bg-white rounded-xl shadow-sm border border-stone-200/70 px-5 lg:px-6 py-4 grid grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Inventory summary">
+
+            <div class="min-w-0">
+
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                    Total Ingredients
+                </p>
+
+                <p class="text-xl font-bold text-stone-900 tabular-nums mt-1">
+                    {{ $totalIngredients }}
+                </p>
+
+            </div>
+
+            <div class="min-w-0">
+
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                    Low Stock
+                </p>
+
+                <p class="text-xl font-bold text-red-700 tabular-nums mt-1">
+                    {{ $lowStockCount }}
+                </p>
+
+            </div>
+
+            <div class="min-w-0">
+
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                    Out of Stock
+                </p>
+
+                <p class="text-xl font-bold text-red-700 tabular-nums mt-1">
+                    {{ $outOfStockCount }}
+                </p>
+
+            </div>
+
+            <div class="min-w-0">
+
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                    Estimated Inventory Value
+                </p>
+
+                <p class="text-xl font-bold text-amber-700 tabular-nums mt-1">
+                    &#8369;{{ number_format($inventoryValue, 2) }}
+                </p>
+
+            </div>
+
+        </section>
 
 
         <!-- ============================= -->
@@ -703,17 +854,6 @@
                     <tbody class="divide-y divide-stone-100">
 
 
-                        @php
-
-                        $recentProducts =
-                        \App\Models\Product::with('category')
-                        ->latest()
-                        ->take(5)
-                        ->get();
-
-                        @endphp
-
-
                         @forelse($recentProducts as $product)
 
 
@@ -825,6 +965,348 @@
                                 class="px-6 py-10 text-center text-stone-500 text-sm">
 
                                 No products found.
+
+                            </td>
+
+                        </tr>
+
+
+                        @endforelse
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================= -->
+        <!-- RECENT STOCK IN -->
+        <!-- ============================= -->
+
+        <section class="mt-6 lg:mt-8 bg-white rounded-xl shadow-sm border border-stone-200/70 overflow-hidden" aria-label="Recent stock in">
+
+
+            <div class="px-5 lg:px-6 py-4 lg:py-5 border-b border-stone-200/70">
+
+                <div class="flex items-center justify-between gap-3">
+
+                    <div>
+
+                        <h3 class="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
+
+                            Recent Stock In
+
+                        </h3>
+
+                        <p class="text-xs sm:text-sm text-stone-500 mt-0.5">
+                            Latest ingredient deliveries
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="{{ route('stock-ins.index') }}"
+                        class="text-sm text-amber-700 hover:text-amber-800 font-medium whitespace-nowrap">
+
+                        View All &rarr;
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-sm">
+
+
+                    <thead class="bg-stone-50">
+
+                        <tr class="text-left text-xs uppercase tracking-wider text-stone-500">
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
+                                Ingredient
+                            </th>
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold text-right tabular-nums">
+                                Quantity
+                            </th>
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
+                                Unit
+                            </th>
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-stone-100">
+
+
+                        @forelse($recentStockIns as $stockIn)
+
+
+                        <tr class="hover:bg-stone-50/70 transition">
+
+
+                            <!-- INGREDIENT -->
+
+                            <td class="px-5 lg:px-6 py-4 font-medium text-stone-800 whitespace-nowrap">
+
+                                @if($stockIn->ingredient)
+
+                                {{ $stockIn->ingredient->name }}
+
+                                @else
+
+                                <span class="text-stone-400">No Ingredient</span>
+
+                                @endif
+
+                            </td>
+
+
+                            <!-- QUANTITY -->
+
+                            <td class="px-5 lg:px-6 py-4 text-right font-semibold text-emerald-700 tabular-nums whitespace-nowrap">
+
+                                +{{ number_format($stockIn->quantity, 2) }}
+
+                            </td>
+
+
+                            <!-- UNIT -->
+
+                            <td class="px-5 lg:px-6 py-4">
+
+                                @if($stockIn->ingredient)
+
+                                <span class="inline-flex items-center bg-stone-100 text-stone-700 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+
+                                    {{ $stockIn->ingredient->unit }}
+
+                                </span>
+
+                                @else
+
+                                <span class="inline-flex items-center bg-stone-100 text-stone-400 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+
+                                    &mdash;
+
+                                </span>
+
+                                @endif
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td class="px-5 lg:px-6 py-4 text-stone-600 tabular-nums whitespace-nowrap">
+
+                                {{ $stockIn->stock_in_date->format('M d, Y') }}
+
+                            </td>
+
+
+                        </tr>
+
+
+                        @empty
+
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="px-6 py-10 text-center text-stone-500 text-sm">
+
+                                No stock in records found.
+
+                            </td>
+
+                        </tr>
+
+
+                        @endforelse
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================= -->
+        <!-- RECENT STOCK OUT -->
+        <!-- ============================= -->
+
+        <section class="mt-6 lg:mt-8 bg-white rounded-xl shadow-sm border border-stone-200/70 overflow-hidden" aria-label="Recent stock out">
+
+
+            <div class="px-5 lg:px-6 py-4 lg:py-5 border-b border-stone-200/70">
+
+                <div class="flex items-center justify-between gap-3">
+
+                    <div>
+
+                        <h3 class="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
+
+                            Recent Stock Out
+
+                        </h3>
+
+                        <p class="text-xs sm:text-sm text-stone-500 mt-0.5">
+                            Latest ingredients released from inventory
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="{{ route('stock-outs.index') }}"
+                        class="text-sm text-amber-700 hover:text-amber-800 font-medium whitespace-nowrap">
+
+                        View All &rarr;
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-sm">
+
+
+                    <thead class="bg-stone-50">
+
+                        <tr class="text-left text-xs uppercase tracking-wider text-stone-500">
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
+                                Ingredient
+                            </th>
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold text-right tabular-nums">
+                                Quantity
+                            </th>
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
+                                Unit
+                            </th>
+
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-stone-100">
+
+
+                        @forelse($recentStockOuts as $stockOut)
+
+
+                        <tr class="hover:bg-stone-50/70 transition">
+
+
+                            <!-- INGREDIENT -->
+
+                            <td class="px-5 lg:px-6 py-4 font-medium text-stone-800 whitespace-nowrap">
+
+                                @if($stockOut->ingredient)
+
+                                {{ $stockOut->ingredient->name }}
+
+                                @else
+
+                                <span class="text-stone-400">No Ingredient</span>
+
+                                @endif
+
+                            </td>
+
+
+                            <!-- QUANTITY -->
+
+                            <td class="px-5 lg:px-6 py-4 text-right font-semibold text-red-700 tabular-nums whitespace-nowrap">
+
+                                -{{ number_format($stockOut->quantity, 2) }}
+
+                            </td>
+
+
+                            <!-- UNIT -->
+
+                            <td class="px-5 lg:px-6 py-4">
+
+                                @if($stockOut->ingredient)
+
+                                <span class="inline-flex items-center bg-stone-100 text-stone-700 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+
+                                    {{ $stockOut->ingredient->unit }}
+
+                                </span>
+
+                                @else
+
+                                <span class="inline-flex items-center bg-stone-100 text-stone-400 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+
+                                    &mdash;
+
+                                </span>
+
+                                @endif
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td class="px-5 lg:px-6 py-4 text-stone-600 tabular-nums whitespace-nowrap">
+
+                                {{ $stockOut->stock_out_date->format('M d, Y') }}
+
+                            </td>
+
+
+                        </tr>
+
+
+                        @empty
+
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="px-6 py-10 text-center text-stone-500 text-sm">
+
+                                No stock out records found.
 
                             </td>
 
