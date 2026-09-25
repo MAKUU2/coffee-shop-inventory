@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock In - Coffee Shop Inventory</title>
+    <title>Manage Accounts - Coffee Shop Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-stone-100 min-h-screen text-gray-800 antialiased">
@@ -81,9 +81,8 @@
                 Ingredients
             </a>
             <a href="{{ route('stock-ins.index') }}"
-                aria-current="page"
-                class="flex items-center gap-3 rounded-lg bg-white/10 px-4 py-2.5 text-white border-l-2 border-amber-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
-                <svg class="w-5 h-5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-stone-300 hover:bg-white/5 hover:text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
+                <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.073a2.25 2.25 0 0 1-2.25 2.25h-12a2.25 2.25 0 0 1-2.25-2.25v-4.073M12 3v12m0 0-3.75-3.75M12 15l3.75-3.75" />
                 </svg>
                 Stock In
@@ -103,15 +102,13 @@
                 Low Stock
             </a>
             <a href="{{ route('admins.index') }}"
-                class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-stone-300 hover:bg-white/5 hover:text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
-
-                <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                aria-current="page"
+                class="flex items-center gap-3 rounded-lg bg-white/10 px-4 py-2.5 text-white border-l-2 border-amber-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
+                <svg class="w-5 h-5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                 </svg>
-
                 Manage Accounts
             </a>
-
         </nav>
         <!-- ============================= -->
         <!-- LOGOUT -->
@@ -138,20 +135,20 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
-                    Stock In
+                    Manage Accounts
                 </h1>
                 <p class="text-sm text-stone-500 mt-1 tabular-nums">
-                    {{ $stockIns->count() }} {{ $stockIns->count() == 1 ? 'record' : 'records' }} logged
+                    {{ $admins->count() }} {{ $admins->count() == 1 ? 'admin account' : 'admin accounts' }}
                 </p>
             </div>
             <div class="flex gap-2 sm:gap-3">
                 <a
-                    href="{{ route('stock-ins.create') }}"
+                    href="{{ route('admins.create') }}"
                     class="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium px-4 sm:px-5 py-2.5 rounded-lg transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-100">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-                    Add Stock In
+                    Add Admin
                 </a>
             </div>
         </div>
@@ -171,16 +168,16 @@
             </ul>
         </div>
         @endif
-        <!-- Stock In Table -->
-        <section class="bg-white rounded-xl shadow-sm border border-stone-200/70 overflow-hidden" aria-label="Stock in list">
+        <!-- Admin Table -->
+        <section class="bg-white rounded-xl shadow-sm border border-stone-200/70 overflow-hidden" aria-label="Admin accounts">
             <div class="px-5 lg:px-6 py-4 lg:py-5 border-b border-stone-200/70">
                 <div class="flex items-center justify-between gap-3">
                     <div>
                         <h2 class="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
-                            Stock In Records
+                            Admin Accounts
                         </h2>
                         <p class="text-xs sm:text-sm text-stone-500 mt-0.5">
-                            Incoming ingredient deliveries
+                            Accounts with full inventory access
                         </p>
                     </div>
                 </div>
@@ -193,118 +190,52 @@
                                 ID
                             </th>
                             <th class="px-5 lg:px-6 py-3.5 font-semibold">
-                                Ingredient
-                            </th>
-                            <th class="px-5 lg:px-6 py-3.5 font-semibold text-right tabular-nums">
-                                Quantity
-                            </th>
-                            <th class="px-5 lg:px-6 py-3.5 font-semibold text-right tabular-nums">
-                                Cost / Unit
+                                Name
                             </th>
                             <th class="px-5 lg:px-6 py-3.5 font-semibold">
-                                Date
+                                Username
                             </th>
                             <th class="px-5 lg:px-6 py-3.5 font-semibold">
-                                Notes
+                                Role
                             </th>
-                            <th class="px-5 lg:px-6 py-3.5 font-semibold">
-                                Actions
+                            <th class="px-5 lg:px-6 py-3.5 font-semibold tabular-nums">
+                                Created
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-100">
-                        @forelse($stockIns as $stockIn)
+                        @forelse($admins as $admin)
                         <tr class="hover:bg-stone-50/70 transition">
-                            <!-- ID -->
                             <td class="px-5 lg:px-6 py-4 text-xs text-stone-400 tabular-nums whitespace-nowrap">
-                                #{{ $stockIn->id }}
+                                #{{ $admin->id }}
                             </td>
-                            <!-- Ingredient -->
-                            <td class="px-5 lg:px-6 py-4 min-w-36">
-                                <div class="font-semibold text-stone-800">
-                                    {{ $stockIn->ingredient->name ?? '&mdash;' }}
-                                </div>
+                            <td class="px-5 lg:px-6 py-4 font-semibold text-stone-800 whitespace-nowrap">
+                                {{ trim($admin->first_name.' '.($admin->middle_name ? $admin->middle_name.' ' : '').$admin->last_name) }}
                             </td>
-                            <!-- Quantity -->
-                            <td class="px-5 lg:px-6 py-4 text-right whitespace-nowrap">
-                                <span class="font-medium text-stone-800 tabular-nums">{{ $stockIn->quantity }}</span>
-                                <span class="inline-flex items-center bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ml-1">{{ $stockIn->ingredient->unit ?? '' }}</span>
+                            <td class="px-5 lg:px-6 py-4 text-stone-600 whitespace-nowrap">
+                                {{ $admin->username }}
                             </td>
-                            <!-- Cost -->
-                            <td class="px-5 lg:px-6 py-4 text-right text-stone-800 tabular-nums whitespace-nowrap">
-                                &#8369;{{ number_format($stockIn->cost_per_unit, 2) }}
-                            </td>
-                            <!-- Date -->
-                            <td class="px-5 lg:px-6 py-4 text-stone-600 tabular-nums whitespace-nowrap">
-                                {{ $stockIn->stock_in_date->format('M d, Y') }}
-                            </td>
-                            <!-- Notes -->
-                            <td class="px-5 lg:px-6 py-4 text-stone-500 min-w-32">
-                                @if($stockIn->notes)
-                                <span class="block truncate max-w-48">{{ $stockIn->notes }}</span>
-                                @else
-                                <span class="text-stone-300">&mdash;</span>
-                                @endif
-                            </td>
-                            <!-- Actions -->
                             <td class="px-5 lg:px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <a
-                                        href="{{ route('stock-ins.edit', $stockIn) }}"
-                                        aria-label="Edit stock in record {{ $stockIn->id }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-medium px-3 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
-                                        </svg>
-                                        Edit
-                                    </a>
-                                    <form
-                                        action="{{ route('stock-ins.destroy', $stockIn) }}"
-                                        method="POST"
-                                        class="inline"
-                                        onsubmit="return confirm('Are you sure you want to delete this Stock In record?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button
-                                            type="submit"
-                                            aria-label="Delete stock in record {{ $stockIn->id }}"
-                                            class="inline-flex items-center gap-1.5 rounded-lg text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 text-xs sm:text-sm font-medium px-3 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                            </svg>
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
+                                <span class="inline-flex items-center bg-stone-100 text-stone-700 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                                    {{ $admin->role }}
+                                </span>
+                            </td>
+                            <td class="px-5 lg:px-6 py-4 text-stone-600 tabular-nums whitespace-nowrap">
+                                {{ $admin->created_at->format('M d, Y') }}
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td
-                                colspan="7"
+                                colspan="5"
                                 class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center gap-3">
-                                    <span class="flex items-center justify-center w-12 h-12 rounded-full bg-stone-100 text-stone-400" aria-hidden="true">
-                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.073a2.25 2.25 0 0 1-2.25 2.25h-12a2.25 2.25 0 0 1-2.25-2.25v-4.073M12 3v12m0 0-3.75-3.75M12 15l3.75-3.75" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <p class="font-semibold text-stone-800">
-                                            No Stock In records found.
-                                        </p>
-                                        <p class="text-sm text-stone-500 mt-1">
-                                            Get started by recording your first delivery.
-                                        </p>
-                                    </div>
-                                    <a
-                                        href="{{ route('stock-ins.create') }}"
-                                        class="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-100">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                        </svg>
-                                        Add your first stock in
-                                    </a>
+                                    <p class="font-semibold text-stone-800">
+                                        No admin accounts found.
+                                    </p>
+                                    <p class="text-sm text-stone-500 mt-1">
+                                        Register the first account through the setup page.
+                                    </p>
                                 </div>
                             </td>
                         </tr>

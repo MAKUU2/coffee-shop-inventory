@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -159,4 +160,17 @@ Route::middleware('admin.auth')->group(function () {
 
     Route::get('/low-stock', [LowStockController::class, 'index'])
         ->name('low-stock.index');
+
+    // =============================
+    // ADMIN ACCOUNT ROUTES
+    // =============================
+
+    Route::get('/admins', [AdminController::class, 'index'])
+        ->name('admins.index');
+
+    Route::get('/admins/create', [AdminController::class, 'create'])
+        ->name('admins.create');
+
+    Route::post('/admins', [AdminController::class, 'store'])
+        ->name('admins.store');
 });
